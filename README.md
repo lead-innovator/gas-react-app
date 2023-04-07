@@ -4,7 +4,7 @@ This project creates a react version of Klotski game running on Google Web using
 The game interface includes a timer to track each game duration, and on game completion, 
 the timing is written to a google spreadsheet, which can later be retrieved and displayed.
 
-The project adapted from a Klotski game written in react:
+The project is adapted from a Klotski game written in react:
 [Japanese Klotski Puzzle](https://github.com/ziqingW/Japan-klotski).
 
 The icons in the projects are taken from [Flaticon](https://www.flaticon.com/search?word=bird).
