@@ -33,18 +33,8 @@ function querySpreadSheetData(ss_name, sheet_name) {
     var ss = files.hasNext() ? SpreadsheetApp.openById(files.next().getId()) : null
     var sheet = ss != null ? ss.getSheetByName(sheet_name) : null
     if (sheet == null) {
-        return ""
+        return null
     } else {
-        values = sheet.getDataRange().getValues()
-        result = ""
-        for (var i = 0; i < values.length; i++) {
-            for (var j = 0; j < values[i].length; j++) {
-                if (values[i][j]) {
-                    result = result + values[i][j] + ' '
-                }
-            }
-            result = result + "\n"
-        }
-        return result;
+        return sheet.getDataRange().getValues()
     }
 }
