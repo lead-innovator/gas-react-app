@@ -1,32 +1,42 @@
 import React, { Component } from 'react';
 import {Grid, Button, withStyles, Modal} from '@material-ui/core'
-import {Details, Help} from '@material-ui/icons'
 import GridLayout from "react-grid-layout";
 import HelpText from './components/HelpText'
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
+import { GASClient } from 'gas-client';
 
-const gridBack = 'https://cdn-icons-png.flaticon.com/512/5853/5853902.png'
-const sky = 'https://cdn-icons-png.flaticon.com/512/2220/2220091.png'
+// --- Enable invoking server functions in ./apps-script/main.js from the client --- //
+const { serverFunctions } = new GASClient();
+
+// --- Icon used by the square grid --- //
+const gridIcon = 'https://cdn-icons-png.flaticon.com/512/5853/5853902.png'
+
+// --- Icon of the background --- //
+const bgImage = 'https://cdn-icons-png.flaticon.com/512/2220/2220091.png'
 
 const layout = [
-    {i: "0", x: 0, y: 0, w: 2, h: 2, name: ""},
+    {i: "0", x: 0, y: 0, w: 1, h: 2, name: ""},
     {i: "1", x: 1, y: 0, w: 2, h: 2, name: "(ᵔᴥᵔ)"},
     {i: "2", x: 3, y: 0, w: 1, h: 2, name: ""},
-    {i: "3", x: 0, y: 2, w: 1, h: 2, name: ""},
-    {i: "4", x: 1, y: 2, w: 2, h: 1, name: ""},
-    {i: "5", x: 1, y: 3, w: 1, h: 1, name: ""},
-    {i: "6", x: 2, y: 3, w: 1, h: 1, name: ""},
-    {i: "7", x: 3, y: 2, w: 1, h: 2, name: ""},
-    {i: "8", x: 0, y: 4, w: 1, h: 1, name: ""},
-    {i: "9", x: 4, y: 4, w: 1, h: 1, name: ""},
+    {i: "3", x: 0, y: 2, w: 1, h: 1, name: ""},
+    {i: "4", x: 1, y: 2, w: 1, h: 1, name: ""},
+    {i: "5", x: 2, y: 2, w: 1, h: 1, name: ""},
+    {i: "6", x: 3, y: 2, w: 1, h: 1, name: ""},
+    {i: "7", x: 0, y: 3, w: 1, h: 1, name: ""},
+    {i: "8", x: 1, y: 3, w: 1, h: 1, name: ""},
+    {i: "9", x: 2, y: 3, w: 1, h: 1, name: ""},
+    {i: "10", x: 3, y: 3, w: 1, h: 1, name: ""},
+    {i: "11", x: 0, y: 4, w: 1, h: 1, name: ""},
+    {i: "12", x: 3, y: 4, w: 1, h: 1, name: ""},
 ]
 
 const originalLayout = getFromLS("layout") || Object.assign([],layout);
+const originalDuration = getFromLS("playDuration") || 0;
 
 const styles = {
     wrapper: {
         minHeight: "100vh",
-        backgroundImage: `url(${sky})`,
+        backgroundImage: `url(${bgImage})`,
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
@@ -34,8 +44,8 @@ const styles = {
 
     frame : {
         border : "1px solid black",
-        width: '600px',
-        height: '760px',
+        width: '100%',
+        height: '800px',
         padding: '10px',
         borderRadius: '5px',
         backgroundColor: "rgba(249, 249, 97, 0.5)",
@@ -61,7 +71,7 @@ const styles = {
         boxShadow: "2px 2px 3px black",
         borderRadius: "2px",
         boxSizing: "border-box",
-        backgroundImage : `url(${gridBack})`,
+        backgroundImage : `url(${gridIcon})`,
         fontSize: "3em",
         color: "#202020",
         textShadow: "1px 1px 1px #ccc",
@@ -87,7 +97,7 @@ const styles = {
     },
 
     bBlock: {
-        fontSize: "5em",
+        fontSize: "6em",
         color: '#e04c23',
         textShadow: "2px 2px 1px black"
     },
@@ -115,13 +125,13 @@ const styles = {
     },
 
     modalScreen: {
-        minHeight: "200vh",
+        minHeight: "100vh",
         backgroundColor: "rgba(255,255,255,0.7)",
     },
 
     modalContent : {
-        width: "860px",
-        height: "600px",
+        width: "430px",
+        height: "300px",
         textAlign: "center",
     }
 }
@@ -132,6 +142,7 @@ function getFromLS (key) {
         try {
             ls = JSON.parse(global.localStorage.getItem("klotski")) || {};
         } catch (e) {
+            alert(e)
         }
     }
     return ls[key];
@@ -145,6 +156,7 @@ function saveToLS (key, value) {
 
 class App extends Component {
     targetElement = null;
+    playTimerCounter = null;
 
     constructor(props) {
         super(props)
@@ -153,7 +165,8 @@ class App extends Component {
             prevLayout: [],
             dragged: null,
             win: false,
-            helpOpen: false
+            helpOpen: false,
+            playDuration: originalDuration
         }
     }
 
@@ -168,9 +181,13 @@ class App extends Component {
     onLayoutChange = layout => {
         const dragged = this.state.dragged
         if (dragged) {
-            const currentLayout = layout.slice(0,10)
+            const currentLayout = layout.slice(0,13)
             const newItem = currentLayout[dragged]
             const oldItem = this.state.prevLayout[dragged]
+
+            console.log("onLayoutChange")
+            console.log(oldItem)
+
             if (newItem.x !== oldItem.x || newItem.y !== oldItem.y) {
                 if (Math.abs(newItem.x - oldItem.x) > 1 ||
                     Math.abs(newItem.y - oldItem.y) > 1 ||
@@ -178,8 +195,10 @@ class App extends Component {
                     global.location.reload()
                 } else {
                     let win = false
-                    if (newItem.i === "1" && newItem.x === 1 && newItem.y ===3) {
+                    if (newItem.i === "1" && newItem.x === 1 && newItem.y === 3) {
                         win = true
+                        this.saveTiming()
+                        clearInterval(this.playTimerCounter)
                     }
                     this.setState({layout: currentLayout, win: win})
                     saveToLS("layout", currentLayout)
@@ -189,8 +208,10 @@ class App extends Component {
     }
 
     onDragStart = (layout, oldItem, newItem, placeholder, e, element) => {
+        console.log("onDragStart")
+        console.log(layout.slice(0,13))
         this.setState({
-            prevLayout : Object.assign([], layout.slice(0,10))
+            prevLayout : Object.assign([], layout.slice(0,13))
         })
     }
 
@@ -210,29 +231,46 @@ class App extends Component {
         this.setState({ helpOpen: false })
     }
 
+    // --- Invoke server function in ./apps-script/main.js to append play timing to google sheet -- //
+    saveTiming = () => {
+        serverFunctions.appendSpreadSheetData("game-result", "klotski", this.state.playDuration)
+    }
+
     reset = e => {
         this.setState({
-            layout: Object.assign([],layout),
+            layout: Object.assign([], layout),
             win: false
         })
         global.localStorage.clear()
+        this.setState({playDuration: 0})
+
+        clearInterval(this.playTimerCounter)
+        this.playTimerCounter = setInterval(() => {
+            this.setState({playDuration: this.state.playDuration + 1})
+            saveToLS("playDuration", this.state.playDuration)
+        }, 1000)
     }
 
     render() {
         const {classes} = this.props
+        if (this.playTimerCounter) {
+            clearInterval(this.playTimerCounter)
+        }
+        this.playTimerCounter = setInterval(() => {
+            this.setState({playDuration: this.state.playDuration + 1})
+            saveToLS("playDuration", this.state.playDuration)
+        }, 1000)
+
         return (
-            <Grid container direction="column" justify="flex-start" alignItems="center" className={classes.wrapper} id="mainPanel">
-                <h1 style={{margin: "15px 0 0 0", textShadow: "1px 1px 1px white"}}>Pet in the box</h1>
-                <Help className={classes.help} onClick={this.openHelp}/>
-                <HelpText open={this.state.helpOpen} onClose={this.handleClose} />
-                <h4 style={{margin: "5px 0"}}><i>-- a klotski game --</i></h4>
+            <Grid container direction="column" justify="flex" alignItems="right" className={classes.wrapper} id="mainPanel">
                 <Grid container justify="flex-start" className={classes.frame}>
-                    <GridLayout layout={this.state.layout} cols={4} rowHeight={140} width={560} margin={[2,2]}
+                    <GridLayout layout={this.state.layout} cols={4} rowHeight={140} width={560} margin={[1,1]}
                                 containerPadding = {[0,0]} isResizable={false} preventCollision={true}
                                 compactType={null} onLayoutChange={this.onLayoutChange} onDragStart={this.onDragStart}
                                 onDragStop={this.onDragStop} draggableHandle=".moving-grid">
                         {layout.map((block, i) => {
-                            const classTag = ([0,2,3,7].includes(i) ? classes.vBlock : ([5,6,8,9].includes(i) ? classes.sBlock : (i === 4 ? classes.wBlock : classes.bBlock)))
+                            const classTag = ([0,2].includes(i) ?
+                                classes.vBlock : ([3,4,5,6,7,8,9,10,11,12].includes(i) ? classes.wBlock : classes.bBlock))
                             return (
                                 <div className={this.state.win ? [classes.grid, classTag] : [classes.grid, "moving-grid", classTag]} key={block.i}>{block.name}</div>
                             )}
@@ -240,12 +278,20 @@ class App extends Component {
                         <div key="z" data-grid={{x: 0, y: 5, w: 4, h: 3, static: true}}></div>
                     </GridLayout>
                 </Grid>
-                <Grid container justify="center" direction="column" alignItems="center">
-                    <Details style={{marginTop: "5px"}}/>
-                    <h3 className={this.state.win ? classes.freedom : classes.nonfreedom}><i>EXIT</i></h3>
-                    <Button variant="contained" className={classes.button} onClick={this.reset}>
-                        Reset
-                    </Button>
+                <Grid container justify="left" direction="column" alignItems="left">
+                    <div style={{marginLeft: "200px"}}>
+                        <h3 className={this.state.win ? classes.freedom : classes.nonfreedom} style={{marginLeft: "68px", marginTop: "-80px"}}><i>EXIT</i></h3>
+                        <h2 style={{marginLeft: "20px", color: "#008C55"}}>Time (Sec): {this.state.playDuration}</h2>
+                        <div align="left">
+                            <Button variant="contained" className={classes.button} onClick={this.reset}>
+                                Reset
+                            </Button>
+                            &nbsp;&nbsp;
+                            <Button variant="contained" className={classes.button} onClick={this.openHelp}>
+                                Your Timings
+                            </Button>
+                        </div>
+                    </div>
                 </Grid>
                 <Modal open={this.state.win}>
                     <Grid container direction="column" justify="center" alignItems="center" className={classes.modalScreen}>
@@ -253,6 +299,7 @@ class App extends Component {
                             <div>
                                 <h3>You helped the Pet get freedom!</h3>
                                 <h3>You are the hero!</h3>
+                                <h3>Your Timings: {this.state.playDuration} seconds</h3>
                             </div>
                             <Button style={{marginTop:"50px"}} variant="contained" color="primary" onClick={this.reset}>
                                 Replay
@@ -260,6 +307,8 @@ class App extends Component {
                         </Grid>
                     </Grid>
                 </Modal>
+                <HelpText open={this.state.helpOpen} onClose={this.handleClose} />
+
             </Grid>
         );
     }

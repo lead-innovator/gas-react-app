@@ -25,6 +25,7 @@
     "@mui/material": "^5.11.16",
     "@types/google-apps-script": "^1.0.59",
     "body-scroll-lock": "^2.6.1",
+    "gas-client": "^1.1.1",
     "parcel": "^2.8.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
