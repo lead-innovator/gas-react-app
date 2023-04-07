@@ -18,6 +18,10 @@ class HelpText extends Component {
     }
   }
 
+  componentDidMount() {
+    this.queryTiming()
+  }
+
   // --- Invoke server function in ./apps-script/main.js to query play timing from google sheet -- //
   queryTiming = () => {
     serverFunctions.querySpreadSheetData("game-result", "klotski")
@@ -31,11 +35,10 @@ class HelpText extends Component {
 
   render() {
     const { classes, onClose, ...other } = this.props
-    this.queryTiming()
     return (
       <Dialog onClose={this.handleClose} {...other}>
         <Grid className={classes.helpContents} container justify="center" direction="column" alignItems="center">
-          <div>Your Timings (sec)</div>
+          <h3>Your Timings (sec)</h3>
           <div style={{ whiteSpace: 'pre-wrap' }}>
             {this.state.result}
           </div>

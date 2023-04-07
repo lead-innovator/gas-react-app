@@ -1,16 +1,16 @@
 # React App Deployment on Google App Script 
 
 This project creates a react version of Klotski game running on Google Web using Google Apps Script. 
-The game interface includes a timer to track the each game duration, which on game completion, 
-will be written to a google spreadsheet, and later retrieved and displayed.
+The game interface includes a timer to track each game duration, and on game completion, 
+written to a google spreadsheet, which can be retrieved and displayed.
 
-The project template is taken from the source code of 
+The project adapted from a Klotski game written in react:
 [Japanese Klotski Puzzle](https://github.com/ziqingW/Japan-klotski).
 
-The icons in the projects are taken from [Flaticon](https://www.flaticon.com/search?word=bird)
+The icons in the projects are taken from [Flaticon](https://www.flaticon.com/search?word=bird).
 
 The app can be accessible using Chrome browser via the link <br>
-https://script.google.com/macros/s/AKfycbzk5o7FqvujfUsqdRwPtb3P-TPVX6NYFVhbbNN_WBHpyUpYGtUin6L7wNRUQ3P0WJAY/exec
+https://script.google.com/macros/s/AKfycbyzOyRWVSXQwWS7Cl9ZvS10WH08GUx4UzRWWniuuabBLUfOV-lO1LpDw89FodQvdAWIpg/exec
 
 ![Game Interface](img/Game-UI.png "Game UI")
 

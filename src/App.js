@@ -173,21 +173,28 @@ class App extends Component {
     componentDidMount() {
         this.targetElement = document.querySelector('#mainPanel');
         disableBodyScroll(this.targetElement);
+        this.setState({playDuration: 0})
+        this.playTimerCounter = setInterval(() => {
+            this.setState({playDuration: this.state.playDuration + 1})
+            saveToLS("playDuration", this.state.playDuration)
+        }, 1000)
     }
 
     componentWillUnmount() {
         clearAllBodyScrollLocks();
+        if (this.playTimerCounter) {
+            clearInterval(this.playTimerCounter)
+            this.setState({playDuration: 0})
+            saveToLS("playDuration", this.state.playDuration)
+        }
     }
+
     onLayoutChange = layout => {
         const dragged = this.state.dragged
         if (dragged) {
             const currentLayout = layout.slice(0,13)
             const newItem = currentLayout[dragged]
             const oldItem = this.state.prevLayout[dragged]
-
-            console.log("onLayoutChange")
-            console.log(oldItem)
-
             if (newItem.x !== oldItem.x || newItem.y !== oldItem.y) {
                 if (Math.abs(newItem.x - oldItem.x) > 1 ||
                     Math.abs(newItem.y - oldItem.y) > 1 ||
@@ -208,8 +215,6 @@ class App extends Component {
     }
 
     onDragStart = (layout, oldItem, newItem, placeholder, e, element) => {
-        console.log("onDragStart")
-        console.log(layout.slice(0,13))
         this.setState({
             prevLayout : Object.assign([], layout.slice(0,13))
         })
@@ -239,30 +244,16 @@ class App extends Component {
     reset = e => {
         this.setState({
             layout: Object.assign([], layout),
+            playDuration: 0,
             win: false
         })
         global.localStorage.clear()
-        this.setState({playDuration: 0})
-
-        clearInterval(this.playTimerCounter)
-        this.playTimerCounter = setInterval(() => {
-            this.setState({playDuration: this.state.playDuration + 1})
-            saveToLS("playDuration", this.state.playDuration)
-        }, 1000)
     }
 
     render() {
         const {classes} = this.props
-        if (this.playTimerCounter) {
-            clearInterval(this.playTimerCounter)
-        }
-        this.playTimerCounter = setInterval(() => {
-            this.setState({playDuration: this.state.playDuration + 1})
-            saveToLS("playDuration", this.state.playDuration)
-        }, 1000)
-
         return (
-            <Grid container direction="column" justify="flex" alignItems="right" className={classes.wrapper} id="mainPanel">
+            <Grid container direction="column" justify="flex-start" alignItems="center" className={classes.wrapper} id="mainPanel">
                 <Grid container justify="flex-start" className={classes.frame}>
                     <GridLayout layout={this.state.layout} cols={4} rowHeight={140} width={560} margin={[1,1]}
                                 containerPadding = {[0,0]} isResizable={false} preventCollision={true}
@@ -278,7 +269,7 @@ class App extends Component {
                         <div key="z" data-grid={{x: 0, y: 5, w: 4, h: 3, static: true}}></div>
                     </GridLayout>
                 </Grid>
-                <Grid container justify="left" direction="column" alignItems="left">
+                <Grid container justify="flex-start" direction="column" alignItems="flex-start">
                     <div style={{marginLeft: "200px"}}>
                         <h3 className={this.state.win ? classes.freedom : classes.nonfreedom} style={{marginLeft: "68px", marginTop: "-80px"}}><i>EXIT</i></h3>
                         <h2 style={{marginLeft: "20px", color: "#008C55"}}>Time (Sec): {this.state.playDuration}</h2>
@@ -308,7 +299,6 @@ class App extends Component {
                     </Grid>
                 </Modal>
                 <HelpText open={this.state.helpOpen} onClose={this.handleClose} />
-
             </Grid>
         );
     }
