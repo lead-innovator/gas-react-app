@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {Grid, withStyles, Dialog, DialogTitle} from '@material-ui/core'
 import {GASClient} from "gas-client";
 
+// --- Enable invoking server functions in ./apps-script/main.js from the client --- //
 const { serverFunctions } = new GASClient();
 
 const styles = {
@@ -77,9 +78,6 @@ class HelpText extends Component {
   }
 
   render() {
-
-    console.log(Math.min([1,2,3,4]))
-
     const { classes, onClose, ...other } = this.props
     return (
       <Dialog onClose={this.handleClose} {...other}>
