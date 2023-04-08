@@ -9,7 +9,7 @@ The project is adapted from a Klotski game written in react:
 
 The icons in the projects are taken from [Flaticon](https://www.flaticon.com/search?word=bird).
 
-The app can be accessible using Chrome browser via the link <br>
+A demo of the app hosted in Google App platfrom can be accessed via the link using Chrome <br>
 https://script.google.com/macros/s/AKfycbzUWL_aoOlAzLI1M6o3pM4792CFu5jHcwc4zoz71YYS-fKmYzMFGBYXB-FT85T5vgmM/exec
 
 ![Game Interface](img/Game-UI.png "Game UI")
