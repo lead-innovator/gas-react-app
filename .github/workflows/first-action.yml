@@ -6,7 +6,7 @@ jobs:
     steps: 
       - name: Print Context
         run: echo "${{ toJSON(github) }}"
-  deploy-code:
+  prepare-code:
     needs: info
     runs-on: ubuntu-latest
     steps:
@@ -20,5 +20,20 @@ jobs:
         run: npm run test
       - name: Build
         run: npm run build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-files
+          path: dist
+  deploy-code:
+    needs: prepare-code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifacts@v3
+        with:
+          name: dist-files
+      - name: List files
+        run: ls
       - name: Deploy
         run: echo "Deploying ..."
