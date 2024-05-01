@@ -17,7 +17,11 @@ jobs:
       - name: lint
         run: npm run lint
       - name: Test
+        id: run-test
         run: npm run test
+      - name: Report failure
+      
+        run: echo "Jobs Failure, please inform Developer."
       - name: Build
         run: npm run build
       - name: Upload artifacts
