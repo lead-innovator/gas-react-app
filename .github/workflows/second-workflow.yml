@@ -1,11 +1,6 @@
 name: Second Workflow
 on: [workflow_dispatch]
 jobs:
-  show-issues:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Output Event
-        run: echo "${{ toJSON(github.event) }}"
   deploy:
     uses: ./.github/workflows/reusable.yml
       
