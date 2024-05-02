@@ -17,12 +17,14 @@ on:
         description: key of the app
         required: true
     outputs:
-      coordinate:
-        description: The xy coordinate
-        value: "(${{ inputs.x-coord }}, ${{ inputs.y-coord }})"
+      coordinates:
+        value: ${{ jobs.deploy.outputs.coords }}
 jobs:
   deploy:
+    outputs:
+      coords: ${{ steps.deploy.outputs.COORDS }}
     runs-on: ubuntu-latest
     steps:
       - name: Deploy
-        run: echo "Deployed to (${{ inputs.x-coord }}, ${{ inputs.y-coord }})"
+        id: deploy
+        run: echo "COORDS=(${{ inputs.x-coord }}, ${{ inputs.y-coord }})" >> $GITHUB_OUTPUT
