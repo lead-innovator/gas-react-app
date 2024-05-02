@@ -8,10 +8,10 @@ jobs:
         strings: ["Hello", "World"]
         include: 
           - node_versions: 20
-          - strings: "V20"
+            strings: "V20"
         exclude:
           - node_versions: 18
-          - strings: "World"
+            strings: "World"
         
     runs-on: ubuntu-latest
     steps: 
