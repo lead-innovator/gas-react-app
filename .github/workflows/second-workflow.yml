@@ -6,4 +6,6 @@ jobs:
     with: 
       x-coord: 10.5
       y-coord: 12.2
+    secrets:
+      api-key: "1234567"
       
