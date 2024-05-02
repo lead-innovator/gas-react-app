@@ -1,8 +1,20 @@
 name: Reusable Deploy
-on: workflow_call
+on: 
+  workflow_call:
+    inputs:
+      x-coord:
+        description: Location x coordinate
+        default: 0.0
+        type: string
+        required: false
+      y-coord:
+        description: Location y coordinate
+        default: 0.0
+        type: string
+        required: false
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy
-        run: echo "Deploying ..." 
+        run: echo "Deployed to (${{ inputs.x-coord }}, ${{ inputs.y-coord }})"
