@@ -6,4 +6,6 @@ jobs:
     steps:
       - name: Output Event
         run: echo "${{ toJSON(github.event) }}"
+  deploy:
+    uses: ./.github/workflows/reusable.yml
       
