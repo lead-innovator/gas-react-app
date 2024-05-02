@@ -16,6 +16,10 @@ on:
       api-key:
         description: key of the app
         required: true
+    outputs:
+      coordinate:
+        description: The xy coordinate
+        value: "(${{ inputs.x-coord }}, ${{ inputs.y-coord }})"
 jobs:
   deploy:
     runs-on: ubuntu-latest
