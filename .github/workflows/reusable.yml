@@ -12,6 +12,10 @@ on:
         default: 0.0
         type: string
         required: false
+    secrets:
+      api-key:
+        description: key of the app
+        required: true
 jobs:
   deploy:
     runs-on: ubuntu-latest
