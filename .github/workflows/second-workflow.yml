@@ -8,4 +8,10 @@ jobs:
       y-coord: 12.2
     secrets:
       api-key: "1234567"
+  print-coord:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: print
+        run: echo "--->>> ${{ needs.deploy.outputs.coords }}"
       
