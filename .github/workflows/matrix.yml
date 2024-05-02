@@ -10,9 +10,5 @@ jobs:
     steps: 
       - name: Get code
         uses: actions/checkout@v3
-      - name: install node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node_versions }}
       - name: Print Text
         run: echo "${{ matrix.strings }}"
