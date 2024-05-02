@@ -3,4 +3,7 @@ on: [workflow_dispatch]
 jobs:
   deploy:
     uses: ./.github/workflows/reusable.yml
+    with: 
+      x-coord: 10.5
+      y-coord: 12.2
       
